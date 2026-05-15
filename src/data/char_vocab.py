@@ -5,11 +5,13 @@
 
 """
 
+from config.datasets import DataParams
+
 
 class CharVocab:
     """char <-> index 双向映射表"""
 
-    def __init__(self, text: str, min_freq: int = 1):
+    def __init__(self, text: str, min_freq: int = DataParams.MIN_FREQ):
         """
         统计字符频率并构建映射表
         Args:
@@ -35,6 +37,21 @@ class CharVocab:
         return "".join(
             self.idx2char[index] for index in indices if index in self.idx2char
         )
+
+    def to_dict(self) -> dict:
+        """序列化为字典,配合 json.dump 使用"""
+        return {
+            "char2idx": self.char2idx,
+            "idx2char": {str(k): v for k, v in self.idx2char.items()},
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "CharVocab":
+        """从字典反序列化,配合 json.load 使用"""
+        vocab = cls.__new__(cls)
+        vocab.char2idx = data["char2idx"]
+        vocab.idx2char = {int(k): v for k, v in data["idx2char"].items()}
+        return vocab
 
     def __len__(self) -> int:
         """返回词表大小"""

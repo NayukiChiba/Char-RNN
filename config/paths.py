@@ -17,7 +17,7 @@ RAW_DATASETS_DIR = get_dir(DATASETS_DIR / "raw")
 PROCESSED_DATASETS_DIR = get_dir(DATASETS_DIR / "processed")
 SHAKESPEARE_DATASET_PATH = RAW_DATASETS_DIR / "shakespeare.txt"
 PROCESSED_SHAKESPEARE_DATASET_PATH = (
-    PROCESSED_DATASETS_DIR / "shakespeare_processed.txt"
+    PROCESSED_DATASETS_DIR / "shakespeare_processed.json"
 )
 
 # === 输出目录 ===
