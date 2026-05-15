@@ -25,7 +25,9 @@ class DataParams:
     SHUFFLE: bool = True
 
     # 训练集比例
-    TRAIN_SPLIT: float = 0.9
+    TRAIN_SPLIT: float = 0.8
+    VAL_SPLIT: float = 0.1
+    TEST_SPLIT: float = 0.1
 
     # 截取前 N 个字符(None = 全量)
     CHAR_LIMIT: int | None = None
