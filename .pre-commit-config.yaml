@@ -15,7 +15,7 @@ repos:
         additional_dependencies: [ruff]
       - id: nbstripout
         name: nbstripout
-        entry: nbstripout
+        entry: nbstripout --keep-output
         language: python
         types: [jupyter]
         additional_dependencies: [nbstripout]

@@ -10,7 +10,7 @@ class DataParams:
     SEQ_LENGTH: int = 100
 
     # 窗口滑动步长
-    STEP: int = 1
+    STEP: int = 10
 
     # 批大小
     BATCH_SIZE: int = 64

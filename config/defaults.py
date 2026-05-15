@@ -29,13 +29,13 @@ class ModelParams:
     EMBEDDING_DIM = 256
 
     # RNN隐藏层维度
-    HIDDEN_DIM = 512
+    HIDDEN_DIM = 256
 
     # RNN层数
-    NUM_LAYERS = 3
+    NUM_LAYERS = 2
 
     # 层间 dropout
-    DROPOUT = 0.3
+    DROPOUT = 0.5
 
 
 class TrainingParams:
@@ -52,7 +52,7 @@ class TrainingParams:
 
     # 优化器
     OPTIMIZER: Literal["Adam", "SGD", "AdamW"] = "Adam"
-
+    WEIGHT_DECAY = 1e-4  # AdamW 的权重衰减
     # 学习率调度器
     LR_SCHEDULER: Literal["StepLR", "CosineAnnealingLR", "ReduceLROnPlateau"] = "StepLR"
 
