@@ -5,13 +5,13 @@ repos:
         name: ruff (format)
         entry: ruff format
         language: python
-        types: [python]
+        types: [python, jupyter]
         additional_dependencies: [ruff]
       - id: ruff
         name: ruff (lint)
         entry: ruff check --fix
         language: python
-        types: [python]
+        types: [python, jupyter]
         additional_dependencies: [ruff]
       - id: nbstripout
         name: nbstripout
