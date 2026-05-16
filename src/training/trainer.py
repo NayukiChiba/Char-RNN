@@ -8,13 +8,17 @@
 
 """
 
+from pathlib import Path
+
 import torch
 from torch import nn
 from tqdm import tqdm
 
 from config.defaults import DefaultParams, ModelParams, TrainingParams
+from config.paths import get_best_checkpoint_path, get_latest_checkpoint_path
 from src.data import test_loader, train_loader, val_loader
 from src.models import create_model
+from src.training.checkpoint import load_checkpoint, save_checkpoint
 from src.training.utils import calc_perplexity, init_hidden
 
 optimizer = {
@@ -53,7 +57,15 @@ class Trainer:
         }
         self.current_epoch = 0
 
-    def train_one_epoch(self):
+        # 保存模型和优化器状态的路径
+        self.best_checkpoint_path = get_best_checkpoint_path(
+            model_name=ModelParams.RNN_TYPE
+        )
+        self.latest_checkpoint_path = get_latest_checkpoint_path(
+            model_name=ModelParams.RNN_TYPE
+        )
+
+    def train_one_epoch(self) -> tuple[float, float]:
         """单epoch训练"""
 
         self.model.train()
@@ -82,4 +94,75 @@ class Trainer:
                 }
             )
 
-        return total_loss / len(self.train_loader)
+        return total_loss / len(self.train_loader), calc_perplexity(
+            total_loss / len(self.train_loader)
+        )
+
+    def validate(self) -> tuple[float, float]:
+        """
+        验证
+
+        """
+        self.model.eval()
+
+        total_loss = 0
+        with torch.no_grad():
+            pbar = tqdm(
+                self.val_loader,
+                desc=f"[Val] Epoch {self.current_epoch + 1:2d}/{self.epochs}",
+            )
+            for x, y in pbar:
+                x, y = x.to(self.device), y.to(self.device)
+
+                hidden = init_hidden(self.model, x.size(0))
+                output, _ = self.model(x, hidden)
+                loss = self.criterion(output.transpose(1, 2), y)
+
+                total_loss += loss.item()
+                pbar.set_postfix(
+                    {
+                        "loss": f"{loss.item():.4f}",
+                        "perplexity": f"{calc_perplexity(loss.item()):.4f}",
+                    }
+                )
+
+        return total_loss / len(self.val_loader), calc_perplexity(
+            total_loss / len(self.val_loader)
+        )
+
+    def fit(self, resume_from: Path | None = None):
+        """
+        训练循环
+        """
+        start_epoch = 1
+
+        if resume_from is not None and resume_from.exists():
+            start_epoch, self.history = load_checkpoint(
+                resume_from, self.model, self.optimizer
+            )
+
+            start_epoch += 1  # 从下一个epoch开始训练
+            print(
+                f"Resuming training from epoch {start_epoch} with history: {self.history}"
+            )
+
+        for epoch in range(start_epoch, self.epochs + 1):
+            self.current_epoch = epoch
+            train_loss, train_perplexity = self.train_one_epoch()
+            val_loss, val_perplexity = self.validate()
+
+            self.history["train_loss"].append(train_loss)
+            self.history["val_loss"].append(val_loss)
+            self.history["train_perplexity"].append(train_perplexity)
+            self.history["val_perplexity"].append(val_perplexity)
+
+            # 每个epoch结束后保存检查点
+            save_checkpoint(
+                self.model,
+                self.optimizer,
+                epoch,
+                self.history,
+                self.latest_checkpoint_path,
+            )
+
+        return self.history
