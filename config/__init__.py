@@ -6,17 +6,16 @@ from config.defaults import (
     TrainingParams,
 )
 from config.paths import (
-    CHECKPOINTS_DIR,
     LOGS_DIR,
     PROCESSED_SHAKESPEARE_DATASET_PATH,
     SHAKESPEARE_DATASET_PATH,
     TENSORBOARD_DIR,
     VISUALIZATIONS_DIR,
 )
+from config.paths import get_best_checkpoint_path, get_latest_checkpoint_path
 
 __all__ = [
     # 路径
-    "CHECKPOINTS_DIR",
     "LOGS_DIR",
     "TENSORBOARD_DIR",
     "VISUALIZATIONS_DIR",
