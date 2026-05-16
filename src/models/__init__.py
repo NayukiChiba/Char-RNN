@@ -24,3 +24,5 @@ def create_model(rnn_type: str, vocab_size: int):
     if rnn_type not in _MODEL_MAP:
         raise ValueError(f"未知模型类型: {rnn_type}，可选: {list(_MODEL_MAP.keys())}")
     return _MODEL_MAP[rnn_type](vocab_size)
+
+__all__ = ["create_model", "CharRNN", "CharLSTM", "CharGRU"]
