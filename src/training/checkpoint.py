@@ -8,7 +8,7 @@ from torch import nn
 from config.defaults import DefaultParams, ModelParams
 
 
-def save_checkpoint(model, optimizer, epoch, history, filepath):
+def save_checkpoint(model:nn.Module, optimizer:torch.optim.Optimizer, epoch:int, history:dict, filepath:Path):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     torch.save(
         {
@@ -27,9 +27,9 @@ def save_checkpoint(model, optimizer, epoch, history, filepath):
     )
 
 
-def load_checkpoint(filepath, model, optimizer=None):
-    ckpt = torch.load(filepath, map_location=DefaultParams.DEVICE, weights_only=False)
-    model.load_state_dict(ckpt["model_state_dict"])
+def load_checkpoint(filepath: Path, model: nn.Module, optimizer: torch.optim.Optimizer = None):
+    checkpoint = torch.load(filepath, map_location=DefaultParams.DEVICE, weights_only=False)
+    model.load_state_dict(checkpoint["model_state_dict"])
     if optimizer is not None:
-        optimizer.load_state_dict(ckpt["optimizer_state_dict"])
-    return ckpt["epoch"], ckpt.get("history", {})
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    return checkpoint["epoch"], checkpoint.get("history", {})
