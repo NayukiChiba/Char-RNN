@@ -11,8 +11,9 @@ from config.paths import (
     SHAKESPEARE_DATASET_PATH,
     TENSORBOARD_DIR,
     VISUALIZATIONS_DIR,
+    get_best_checkpoint_path,
+    get_latest_checkpoint_path,
 )
-from config.paths import get_best_checkpoint_path, get_latest_checkpoint_path
 
 __all__ = [
     # 路径
@@ -28,4 +29,6 @@ __all__ = [
     "TrainingParams",
     "ModelParams",
     "InferenceParams",
+    "get_best_checkpoint_path",
+    "get_latest_checkpoint_path",
 ]

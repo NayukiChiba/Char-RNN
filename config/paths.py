@@ -11,8 +11,6 @@ def get_dir(path: Path):
     return path
 
 
-
-
 # === 数据目录 ===
 DATASETS_DIR = get_dir(ROOT_DIR / "datasets")
 RAW_DATASETS_DIR = get_dir(DATASETS_DIR / "raw")
@@ -35,9 +33,11 @@ def get_checkpoint_dir(model_name: str):
     """根据模型名称获取对应的检查点目录"""
     return get_dir(CHECKPOINTS_DIR / model_name)
 
+
 def get_best_checkpoint_path(model_name: str):
     """获取指定模型的最佳检查点路径"""
     return get_checkpoint_dir(model_name) / "best.pth"
+
 
 def get_latest_checkpoint_path(model_name: str):
     """获取指定模型的最新检查点路径"""
