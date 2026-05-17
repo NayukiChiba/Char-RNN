@@ -36,6 +36,16 @@ def save_checkpoint(
 def load_checkpoint(
     filepath: Path, model: nn.Module, optimizer: torch.optim.Optimizer = None
 ):
+    """
+    Args:
+        filepath: 检查点文件路径
+        model: 待加载权重的模型实例
+        optimizer: 可选，待加载状态的优化器实例
+    Returns:
+        epoch: 加载的检查点对应的训练轮数
+        history: 加载的检查点对应的训练历史记录
+
+    """
     checkpoint = torch.load(
         filepath, map_location=DefaultParams.DEVICE, weights_only=False
     )
