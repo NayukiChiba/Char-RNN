@@ -1,4 +1,5 @@
 from src.training.checkpoint import load_checkpoint, save_checkpoint
+from src.training.logger import Logger
 from src.training.utils import calc_perplexity, init_hidden
 
 __all__ = [
@@ -6,4 +7,5 @@ __all__ = [
     "calc_perplexity",
     "save_checkpoint",
     "load_checkpoint",
+    "Logger",
 ]
