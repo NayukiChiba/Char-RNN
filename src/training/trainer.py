@@ -16,17 +16,12 @@ from tqdm import tqdm
 
 from config.defaults import DefaultParams, ModelParams, TrainingParams
 from config.paths import get_best_checkpoint_path, get_latest_checkpoint_path
-from src.data import test_loader, train_loader, val_loader
+from src.data import test_loader, train_loader, val_loader, vocab
 from src.models import create_model
 from src.training.checkpoint import load_checkpoint, save_checkpoint
 from src.training.logger import Logger
+from src.training.optim import create_lr_scheduler, create_optimizer
 from src.training.utils import calc_perplexity, init_hidden
-
-optimizer = {
-    "Adam": torch.optim.Adam,
-    "SGD": torch.optim.SGD,
-    "AdamW": torch.optim.AdamW,
-}
 
 
 class Trainer:
@@ -37,18 +32,20 @@ class Trainer:
         self.val_loader = val_loader
         self.test_loader = test_loader
 
-        self.optimizer = optimizer.get(TrainingParams.OPTIMIZER)
-        self.criterion = nn.CrossEntropyLoss()
-
         # 训练超参数
         self.epochs = TrainingParams.EPOCHS
         self.clip = TrainingParams.CLIP_GRAD
         self.lr = TrainingParams.LEARNING_RATE
-        self.lr_scheduler = TrainingParams.LR_SCHEDULER
-
         # 模型参数
         # 训练时会重新创建并加载词表大小
-        self.model = create_model(ModelParams.RNN_TYPE, vocab_size=None)
+        self.model = create_model(ModelParams.RNN_TYPE, vocab_size=len(vocab))
+        self.optimizer = create_optimizer(
+            self.model.parameters(), TrainingParams.OPTIMIZER, lr=self.lr
+        )
+        self.lr_scheduler = create_lr_scheduler(
+            self.optimizer, TrainingParams.LR_SCHEDULER
+        )
+        self.criterion = nn.CrossEntropyLoss()
 
         self.history = {
             "train_loss": [],
@@ -80,6 +77,7 @@ class Trainer:
             x, y = x.to(self.device), y.to(self.device)
 
             hidden = init_hidden(self.model, x.size(0))
+            self.optimizer.zero_grad()  # 反向传播前先清零梯度
             output, _ = self.model(x, hidden)
             loss = self.criterion(output.transpose(1, 2), y)
 
@@ -155,11 +153,18 @@ class Trainer:
             self.current_epoch = epoch
             train_loss, train_perplexity = self.train_one_epoch()
             val_loss, val_perplexity = self.validate()
+            if isinstance(
+                self.lr_scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau
+            ):
+                self.lr_scheduler.step(val_loss)  # 根据验证损失调整学习率
+            else:
+                self.lr_scheduler.step()  # 每个epoch结束后调整学习率
 
             self.history["train_loss"].append(train_loss)
             self.history["val_loss"].append(val_loss)
             self.history["train_perplexity"].append(train_perplexity)
             self.history["val_perplexity"].append(val_perplexity)
+
             logger.log_epoch(epoch, train_loss, val_loss)
             # 每个epoch结束后保存检查点
             save_checkpoint(
@@ -169,8 +174,15 @@ class Trainer:
                 self.history,
                 self.latest_checkpoint_path,
             )
-
-        logger.finish(
-            best_epoch=self.current_epoch, best_val_loss=min(self.history["val_loss"])
+        # 训练结束后保存最佳检查点
+        best_epoch = self.history["val_loss"].index(min(self.history["val_loss"])) + 1
+        best_val_loss = min(self.history["val_loss"])
+        save_checkpoint(
+            self.model,
+            self.optimizer,
+            best_epoch,
+            self.history,
+            self.best_checkpoint_path,
         )
+        logger.finish(best_epoch=best_epoch, best_val_loss=best_val_loss)
         return self.history
