@@ -19,6 +19,7 @@ from config.paths import get_best_checkpoint_path, get_latest_checkpoint_path
 from src.data import test_loader, train_loader, val_loader
 from src.models import create_model
 from src.training.checkpoint import load_checkpoint, save_checkpoint
+from src.training.logger import Logger
 from src.training.utils import calc_perplexity, init_hidden
 
 optimizer = {
@@ -134,6 +135,10 @@ class Trainer:
         """
         训练循环
         """
+        # 日志器
+        logger = Logger(model=ModelParams.RNN_TYPE, dataset="shakespeare")
+        logger.start()
+        logger.log_config()
         start_epoch = 1
 
         if resume_from is not None and resume_from.exists():
@@ -155,7 +160,7 @@ class Trainer:
             self.history["val_loss"].append(val_loss)
             self.history["train_perplexity"].append(train_perplexity)
             self.history["val_perplexity"].append(val_perplexity)
-
+            logger.log_epoch(epoch, train_loss, val_loss)
             # 每个epoch结束后保存检查点
             save_checkpoint(
                 self.model,
@@ -165,4 +170,7 @@ class Trainer:
                 self.latest_checkpoint_path,
             )
 
+        logger.finish(
+            best_epoch=self.current_epoch, best_val_loss=min(self.history["val_loss"])
+        )
         return self.history
