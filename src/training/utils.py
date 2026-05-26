@@ -24,5 +24,5 @@ def init_hidden(model: nn.Module, batch_size: int):
 
 
 def calc_perplexity(loss: float) -> float:
-    """交叉熵 → 困惑度"""
+    """交叉熵 -> 困惑度"""
     return math.exp(loss)

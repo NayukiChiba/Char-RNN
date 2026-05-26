@@ -8,7 +8,7 @@ from config.defaults import ModelParams
 
 
 class CharGRU(nn.Module):
-    """Embedding → GRU → Dropout → Linear"""
+    """Embedding -> GRU -> Dropout -> Linear"""
 
     def __init__(self, vocab_size: int):
         super().__init__()

@@ -148,4 +148,4 @@ class Logger:
 
     def log_best(self, epoch: int, val_loss: float):
         """记录最佳模型更新事件"""
-        self._log.info("  → best 模型! epoch %d (val_loss: %.4f)", epoch, val_loss)
+        self._log.info("  -> best 模型! epoch %d (val_loss: %.4f)", epoch, val_loss)

@@ -8,7 +8,7 @@ from config.defaults import ModelParams
 
 
 class CharLSTM(nn.Module):
-    """Embedding → LSTM → Dropout → Linear"""
+    """Embedding -> LSTM -> Dropout -> Linear"""
 
     def __init__(self, vocab_size: int):
         super().__init__()

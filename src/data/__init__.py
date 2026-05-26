@@ -15,7 +15,7 @@ def get_dataloaders():
     返回 train / val / test DataLoader 和 vocab
 
     数据流:
-        shakespeare.txt → process(优先读缓存) → create_dataloaders
+        shakespeare.txt -> process(优先读缓存) -> create_dataloaders
     """
     indices, vocab = get_indices_and_vocab()
     train_loader, val_loader, test_loader = create_dataloaders(indices)

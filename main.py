@@ -4,7 +4,7 @@
     python main.py train --rnn_type LSTM --epochs 30              # 训练
     python main.py eval --checkpoint outputs/checkpoints/LSTM/best.pth   # 评估
     python main.py generate --prompt "ROMEO:"                     # 生成
-    python main.py                                                # 无参数 → 菜单模式
+    python main.py                                                # 无参数 -> 菜单模式
 """
 
 import sys
@@ -80,7 +80,7 @@ def _run_generate(args):
 
 
 def main():
-    # 无参数 → 菜单模式
+    # 无参数 -> 菜单模式
     if len(sys.argv) == 1:
         run_menu()
         return

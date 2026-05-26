@@ -8,7 +8,7 @@ from config.defaults import ModelParams
 
 
 class CharRNN(nn.Module):
-    """Embedding → RNN → Dropout → Linear"""
+    """Embedding -> RNN -> Dropout -> Linear"""
 
     def __init__(self, vocab_size: int):
         super().__init__()

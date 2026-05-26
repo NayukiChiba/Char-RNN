@@ -1,7 +1,7 @@
 """
 文本预处理
 
-原始文本 → 构建词表 → 索引序列
+原始文本 -> 构建词表 -> 索引序列
 优先读取 processed 缓存,无缓存时走完整管线并写入.
 """
 
@@ -31,7 +31,7 @@ def build_vocab(text: str, min_freq: int = DataParams.MIN_FREQ) -> CharVocab:
 
 
 def text_to_indices(text: str, vocab: CharVocab) -> list[int]:
-    """文本 → 索引序列"""
+    """文本 -> 索引序列"""
     return vocab.encode(text)
 
 
